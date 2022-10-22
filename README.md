@@ -1,9 +1,10 @@
 ### Hi there 👋  I am Yadhesh 👦 Welcome to my Profile  
-### I am a Student 📚, CS Enthusiast 😊
+### I am a Software developer and Student 📚, CS Enthusiast 😊
 
 - 👋 Hi, I’m @dasariyadhesh
 - 👀 I’m interested in CS, electronics and latest technologies
-- 🌱 I’m currently learning Java, JavaScript and Spring framework
+- 👀 I'm having good knowledge in java programming and Spring framework technology. 
+- 🌱 I’m currently learning JavaScript and angular framework
 
 ## Social Links
 [<img align="left" target="_blank" alt="Linkedin" width="22px" src="https://media-exp1.licdn.com/dms/image/C4D0BAQGyOWvr4W0Pow/company-logo_200_200/0/1590003577120?e=2159024400&v=beta&t=CtsDFVp0TAdwyg73A8F82MohzKpAQy-pUGA13atPG6A">](https://www.linkedin.com/in/yadhesh-dg-95241720a/)
