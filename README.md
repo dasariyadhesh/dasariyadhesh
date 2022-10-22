@@ -7,7 +7,7 @@
 - 🌱 I’m currently learning JavaScript and angular framework
 
 ## Social Links
-[<img align="left" target="_blank" alt="Linkedin" width="22px" src="https://media-exp1.licdn.com/dms/image/C4D0BAQGyOWvr4W0Pow/company-logo_200_200/0/1590003577120?e=2159024400&v=beta&t=CtsDFVp0TAdwyg73A8F82MohzKpAQy-pUGA13atPG6A">](https://www.linkedin.com/in/dasariyadhesh/)/)
+[<img align="left" target="_blank" alt="Linkedin" width="22px" src="https://media-exp1.licdn.com/dms/image/C4D0BAQGyOWvr4W0Pow/company-logo_200_200/0/1590003577120?e=2159024400&v=beta&t=CtsDFVp0TAdwyg73A8F82MohzKpAQy-pUGA13atPG6A">](https://www.linkedin.com/in/dasariyadhesh/)
 [<img align="left" target="_blank" alt="Instagram" width="22px" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Instagram_logo_2016.svg/768px-Instagram_logo_2016.svg.png">](https://www.instagram.com/yadheshyadhu/)
 [<img align="left" target="_blank" alt="Instagram" width="22px" src="https://s3-symbol-logo.tradingview.com/facebook--600.png">](https://www.facebook.com/people/D-G-Yadhesh-Yadu/100007125555309/)
 <br />
