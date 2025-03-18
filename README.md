@@ -1,22 +1,66 @@
-### Hi there 👋  I am Yadhesh 👦 Welcome to my Profile  
-### I am a Software developer and Student 📚, CS Enthusiast 😊
+# Yadhesh DG
 
-- 👋 Hi, I’m @dasariyadhesh
-- 👀 I’m interested in CS, electronics and latest technologies
-- 👀 I'm having good knowledge in java programming and Spring framework technology. 
-- 🌱 I’m currently learning JavaScript and angular framework
+### Contact Information
+- Email: dasariyadhesh@gmail.com
+- [LinkedIn](#)
+- Phone: +91-9063325407
 
-## Social Links
-[<img align="left" target="_blank" alt="Linkedin" width="22px" src="https://media-exp1.licdn.com/dms/image/C4D0BAQGyOWvr4W0Pow/company-logo_200_200/0/1590003577120?e=2159024400&v=beta&t=CtsDFVp0TAdwyg73A8F82MohzKpAQy-pUGA13atPG6A">](https://www.linkedin.com/in/dasariyadhesh/)
-[<img align="left" target="_blank" alt="Instagram" width="22px" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Instagram_logo_2016.svg/768px-Instagram_logo_2016.svg.png">](https://www.instagram.com/yadhesh_dasari/)
-[<img align="left" target="_blank" alt="Instagram" width="22px" src="https://s3-symbol-logo.tradingview.com/facebook--600.png">](https://www.facebook.com/people/D-G-Yadhesh-Yadu/100007125555309/)
-<br />
+---
 
-## Yadhesh profile stats
-![Yadhesh's GitHub stats](https://github-readme-stats.vercel.app/api?username=dasariyadhesh&count_private=true&show_icons=true)
+## Work Experience
 
-## Popular Languages
-![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=dasariyadhesh&langs_count=10)
+### Blue Yonder (Panasonic)
+**Software Engineer** (September 2024 - Present) - Bangalore, India
+- Optimized inventory management, order fulfillment, and warehouse operations using AI-driven insights and real-time tracking within the Warehouse Management System.
+- Contribute to the development and improvement of key software components to enhance system performance.
 
-### Contributions
-![GitHub Streak](https://github-readme-streak-stats.herokuapp.com/?user=dasariyadhesh)
+### Innominds Software
+**Associate Software Engineer** (May 2022 - September 2024) - Hyderabad, India
+- Developed and maintained scalable features for the DS PRO project using Java, Spring Boot, Drools, MySQL, and other technologies, enhancing its adaptability and performance.
+- Led efforts in migrating databases, implementing asynchronous processing, and ensuring GDPR compliance, resulting in improved efficiency and secure data handling.
+
+---
+
+## Education
+
+### Rajiv Gandhi University of Knowledge and Technologies
+**Bachelor of Technology, Electronics and Communication Engineering** (2018 - 2022)
+- CGPA: 7.6
+
+---
+
+## Skills
+
+- **Languages**: JavaScript, Java, SQL
+- **Libraries, Frameworks**: ReactJS, GraphQL, SpringBoot
+- **Tools and Software**: Git, JIRA, Postman, Notepad, Azure (for cloud computing and DevOps)
+- **Database**: MySQL, OrientDB, Microsoft SQL
+- **Subjects**: Data Structures and Algorithms, Object-Oriented Programming (OOPS), TDD, CI/CD, Software Development Life Cycle (SDLC), Agile Methodology, Operating System, Database Management System, System Design
+
+---
+
+## Projects
+
+### Yard Management System
+- **Description**: Blue Yonder’s Luminate Yard Management is an intelligent SaaS solution designed to optimize trailer movement in yard facilities.
+- **Key Features**:
+  - Gate Management: Optimizes trailer entry and exit operations.
+  - Yard Operations: Streamlines trailer movement and resource management within the yard.
+  - Carrier Workspace: Provides a platform for carriers to efficiently manage their activities.
+  - Metrics: Offers real-time data and insights to track yard performance.
+  - Appointments: Enables scheduling and managing trailer appointments for better coordination.
+
+### DS PRO Commission Engine
+- **Description**: Developed a dynamic multilevel marketing project (DS PRO) focusing on implementing various bonuses, a robust commission engine, and integrating technology stacks for better adaptability and functionality.
+- **Key Contributions**:
+  - Database Management: Efficiently handled database updates using Flyway for seamless migrations, ensuring stable databases and version control.
+  - Implemented asynchronous processing to enhance project functionalities, leading to a 50% performance improvement.
+  - GDPR Compliance: Worked on GDPR compliance, masking and anonymizing data to ensure data privacy and security.
+  - Drools: Played a key role in creating a flexible rule engine for business logic, improving the project’s functionality and adaptability.
+  - Database Migration: Migrated from OrientDB to MySQL, resulting in significant improvements in operational efficiency and performance.
+
+---
+
+## Contact
+
+Feel free to reach out to me through [Email](mailto:dasariyadhesh@gmail.com) or connect with me on [LinkedIn](#).
