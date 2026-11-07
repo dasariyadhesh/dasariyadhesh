@@ -33,7 +33,7 @@ I am a Full Stack Developer with extensive experience in developing and maintain
 ### Rajiv Gandhi University of Knowledge and Technologies
 **Bachelor of Technology, Electronics and Communication Engineering**  
 *2018 - 2022*  
-- CGPA: 7.6
+- CGPA: 8.1
 
 ---
 
