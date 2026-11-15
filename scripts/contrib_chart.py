@@ -1,11 +1,9 @@
-"""Draw the last year of GitHub contributions as light and dark SVG summary cards.
+"""Draw GitHub contribution totals and a contribution-type donut as light and dark SVG cards.
 
-The card shows total contributions and active days. svg() still draws the
-full heatmap if it is ever wanted again; main() uses summary_svg().
-
-Reads the public contribution calendar (private work is included as anonymous
-counts when "Include private contributions" is on) and writes
-assets/contrib-light.svg and assets/contrib-dark.svg.
+Shows contributions and active days for the last 12 months, plus a donut of
+contribution types (private work, commits, pull requests, other). Private work
+is included as anonymous counts when "Include private contributions" is on.
+Writes assets/contrib-light.svg and assets/contrib-dark.svg.
 
 Usage: GITHUB_TOKEN=... python scripts/contrib_chart.py [login] [out_dir]
 Standard library only, so the GitHub Action needs no installs.
@@ -24,6 +22,12 @@ OUT = Path(sys.argv[2] if len(sys.argv) > 2 else "assets")
 QUERY = """query($login: String!) {
   user(login: $login) {
     contributionsCollection {
+      totalCommitContributions
+      totalPullRequestContributions
+      totalIssueContributions
+      totalPullRequestReviewContributions
+      totalRepositoryContributions
+      restrictedContributionsCount
       contributionCalendar {
         totalContributions
         weeks { contributionDays { date contributionCount contributionLevel } }
@@ -34,7 +38,6 @@ QUERY = """query($login: String!) {
 
 SANS = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
 MONO = "ui-monospace, SFMono-Regular, 'Cascadia Mono', Consolas, Menlo, monospace"
-LEVELS = ["NONE", "FIRST_QUARTILE", "SECOND_QUARTILE", "THIRD_QUARTILE", "FOURTH_QUARTILE"]
 
 # One hue (the profile's teal), stepped light -> dark for magnitude.
 # Dark mode is its own ramp: more contributions read as brighter on the dark surface.
@@ -60,125 +63,109 @@ def fetch(login):
         body = json.load(r)
     if "errors" in body:
         sys.exit(f"GraphQL error: {body['errors']}")
-    return body["data"]["user"]["contributionsCollection"]["contributionCalendar"]
+    return body["data"]["user"]["contributionsCollection"]
 
 
-def stats(days):
-    longest = run = 0
-    for d in days:
-        run = run + 1 if d["contributionCount"] else 0
-        longest = max(longest, run)
-    current = 0
-    # Today may still be empty; a streak counts through yesterday.
-    tail = days[:-1] if days and not days[-1]["contributionCount"] else days
-    for d in reversed(tail):
-        if not d["contributionCount"]:
-            break
-        current += 1
-    busiest = max(days, key=lambda d: d["contributionCount"])
-    active = sum(1 for d in days if d["contributionCount"])
-    return longest, current, busiest, active
+
+# Contribution types, in a fixed order with fixed colours (validated categorical
+# slots 1-4 from the dataviz reference palette). Colour follows the type, never rank.
+TYPES = [
+    ("Private work", {"light": "#2a78d6", "dark": "#3987e5"}),
+    ("Commits", {"light": "#eb6834", "dark": "#d95926"}),
+    ("Pull requests", {"light": "#1baf7a", "dark": "#199e70"}),
+    ("Other", {"light": "#eda100", "dark": "#c98500"}),
+]
 
 
-def summary_svg(cal, t):
-    """Two figures only: contributions and active days in the last 12 months."""
+def breakdown(cc):
+    total = cc["contributionCalendar"]["totalContributions"]
+    private = cc["restrictedContributionsCount"]
+    commits = cc["totalCommitContributions"]
+    prs = cc["totalPullRequestContributions"]
+    other = max(total - private - commits - prs, 0)  # issues, reviews, new repos
+    return total, [private, commits, prs, other]
+
+
+def donut(cx, cy, r, width, values, theme, t):
+    import math
+    total = sum(values) or 1
+    parts, start = [], -math.pi / 2
+    for (name, colours), v in zip(TYPES, values):
+        if not v:
+            continue
+        sweep = 2 * math.pi * v / total
+        end = start + sweep
+        if sweep >= 2 * math.pi - 1e-6:  # a single type fills the ring
+            parts.append(f'<circle cx="{cx}" cy="{cy}" r="{r - width / 2}" fill="none" stroke="{colours[theme]}" '
+                         f'stroke-width="{width}"><title>{name}: {v}</title></circle>')
+        else:
+            ro, ri = r, r - width
+            large = 1 if sweep > math.pi else 0
+            x1, y1 = cx + ro * math.cos(start), cy + ro * math.sin(start)
+            x2, y2 = cx + ro * math.cos(end), cy + ro * math.sin(end)
+            x3, y3 = cx + ri * math.cos(end), cy + ri * math.sin(end)
+            x4, y4 = cx + ri * math.cos(start), cy + ri * math.sin(start)
+            d = (f"M{x1:.2f},{y1:.2f} A{ro},{ro} 0 {large} 1 {x2:.2f},{y2:.2f} "
+                 f"L{x3:.2f},{y3:.2f} A{ri},{ri} 0 {large} 0 {x4:.2f},{y4:.2f} Z")
+            # 2px surface-coloured stroke = the gap between neighbouring slices
+            parts.append(f'<path d="{d}" fill="{colours[theme]}" stroke="{t["bg"]}" stroke-width="2">'
+                         f'<title>{name}: {v} ({100 * v / total:.0f}%)</title></path>')
+        start = end
+    return "".join(parts)
+
+
+def summary_svg(cc, t, theme):
+    """Contributions and active days, plus a donut of contribution types."""
+    cal = cc["contributionCalendar"]
     days = [d for w in cal["weeks"] for d in w["contributionDays"]]
     active = sum(1 for d in days if d["contributionCount"])
-    W, H = 920, 132
-    figures = [(f'{cal["totalContributions"]:,}', "contributions"), (f"{active:,}", "active days")]
+    total, values = breakdown(cc)
+    W, H = 920, 200
     p = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" role="img" '
-         f'aria-label="{cal["totalContributions"]} contributions and {active} active days in the last 12 months">',
+         f'aria-label="{total} contributions and {active} active days in the last 12 months; '
+         + "; ".join(f"{n}: {v}" for (n, _), v in zip(TYPES, values)) + '">',
          f'<rect x="0.5" y="0.5" width="{W - 1}" height="{H - 1}" rx="12" fill="{t["bg"]}" stroke="{t["line"]}"/>',
-         f'<text x="32" y="38" font-family="{MONO}" font-size="12" font-weight="600" fill="{t["muted"]}" '
+         f'<text x="32" y="40" font-family="{MONO}" font-size="12" font-weight="600" fill="{t["muted"]}" '
          f'letter-spacing="1.2">LAST 12 MONTHS ON GITHUB</text>']
+
+    # Two headline figures
     x = 32
-    for val, lab in figures:
-        p.append(f'<text x="{x}" y="88" font-family="{SANS}" font-size="40" font-weight="800" fill="{t["ink"]}">{escape(val)}</text>')
-        p.append(f'<text x="{x}" y="112" font-family="{MONO}" font-size="12" fill="{t["muted"]}">{escape(lab)}</text>')
-        x += 240
-    p.append(f'<line x1="{32 + 210}" y1="56" x2="{32 + 210}" y2="114" stroke="{t["line"]}"/>')
-    p.append(f'<text x="{W - 32}" y="112" font-family="{MONO}" font-size="11" fill="{t["muted"]}" text-anchor="end">'
-             f'updated {date.today().strftime("%d %b %Y")} · includes private work</text>')
+    for val, lab in ((f"{total:,}", "contributions"), (f"{active:,}", "active days")):
+        p.append(f'<text x="{x}" y="108" font-family="{SANS}" font-size="44" font-weight="800" fill="{t["ink"]}">{escape(val)}</text>')
+        p.append(f'<text x="{x}" y="132" font-family="{MONO}" font-size="12" fill="{t["muted"]}">{escape(lab)}</text>')
+        x += 190
+    p.append(f'<line x1="400" y1="36" x2="400" y2="164" stroke="{t["line"]}"/>')
+
+    # Donut of contribution types, legend with direct values beside it
+    cx, cy = 500, 104
+    p.append(donut(cx, cy, 62, 20, values, theme, t))
+    p.append(f'<text x="{cx}" y="{cy + 2}" font-family="{SANS}" font-size="20" font-weight="700" fill="{t["ink"]}" '
+             f'text-anchor="middle">{total:,}</text>')
+    p.append(f'<text x="{cx}" y="{cy + 18}" font-family="{MONO}" font-size="10" fill="{t["muted"]}" text-anchor="middle">total</text>')
+    ly = 62
+    shown = [(n, c, v) for (n, c), v in zip(TYPES, values) if v]
+    for name, colours, v in shown:
+        p.append(f'<rect x="604" y="{ly - 10}" width="12" height="12" rx="3" fill="{colours[theme]}"/>')
+        p.append(f'<text x="626" y="{ly}" font-family="{SANS}" font-size="14" fill="{t["ink"]}">{escape(name)}</text>')
+        p.append(f'<text x="830" y="{ly}" font-family="{SANS}" font-size="14" font-weight="600" fill="{t["ink"]}" '
+                 f'text-anchor="end">{v:,}</text>')
+        p.append(f'<text x="888" y="{ly}" font-family="{MONO}" font-size="12" fill="{t["muted"]}" text-anchor="end">'
+                 f'{100 * v / (total or 1):.0f}%</text>')
+        ly += 28
+    p.append(f'<text x="32" y="176" font-family="{MONO}" font-size="11" fill="{t["muted"]}">'
+             f'updated {date.today().strftime("%d %b %Y")} · private work counted without repo names</text>')
     p.append("</svg>")
     return "".join(p)
 
-
-def svg(cal, t):
-    weeks = cal["weeks"]
-    days = [d for w in weeks for d in w["contributionDays"]]
-    longest, _current, busiest, _active = stats(days)
-
-    cell, gap = 13, 3
-    step = cell + gap
-    left, top = 44, 96
-    W = left + len(weeks) * step + 24
-    H = top + 7 * step + 46
-
-    bd = date.fromisoformat(busiest["date"])
-    today = date.fromisoformat(days[-1]["date"])
-    month_total = sum(d["contributionCount"] for d in days
-                      if date.fromisoformat(d["date"]).replace(day=1) == today.replace(day=1))
-    figures = [
-        (f'{cal["totalContributions"]:,}', "contributions, last 12 months"),
-        (f"{month_total:,}", f'in {today.strftime("%B %Y")}'),
-        (f'{busiest["contributionCount"]}', f'busiest day · {bd.strftime("%d %b %Y")}'),
-    ]
-
-    p = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" role="img" '
-         f'aria-label="{cal["totalContributions"]} contributions in the last year; longest streak {longest} days">',
-         f'<rect x="0.5" y="0.5" width="{W - 1}" height="{H - 1}" rx="12" fill="{t["bg"]}" stroke="{t["line"]}"/>']
-
-    # Headline figures (text in ink tokens; the colour lives in the cells)
-    x = left
-    for i, (val, lab) in enumerate(figures):
-        size = 26 if i == 0 else 18
-        p.append(f'<text x="{x}" y="46" font-family="{SANS}" font-size="{size}" font-weight="700" fill="{t["ink"]}">{escape(val)}</text>')
-        p.append(f'<text x="{x}" y="66" font-family="{MONO}" font-size="11" fill="{t["muted"]}">{escape(lab)}</text>')
-        x += 240 if i == 0 else 170
-
-    # Month labels, placed at the first week whose first day starts a new month
-    last_month = None
-    for wi, w in enumerate(weeks):
-        first = date.fromisoformat(w["contributionDays"][0]["date"])
-        if first.month != last_month and wi < len(weeks) - 2:
-            if last_month is not None or first.day <= 7:
-                p.append(f'<text x="{left + wi * step}" y="{top - 8}" font-family="{MONO}" font-size="11" '
-                         f'fill="{t["muted"]}">{first.strftime("%b")}</text>')
-            last_month = first.month
-
-    # Weekday labels
-    for row, name in ((1, "Mon"), (3, "Wed"), (5, "Fri")):
-        p.append(f'<text x="{left - 8}" y="{top + row * step + 10}" font-family="{MONO}" font-size="10" '
-                 f'fill="{t["muted"]}" text-anchor="end">{name}</text>')
-
-    # Cells; the 3px gap is the surface showing through between fills
-    for wi, w in enumerate(weeks):
-        for d in w["contributionDays"]:
-            row = date.fromisoformat(d["date"]).isoweekday() % 7  # Sunday = 0
-            lvl = LEVELS.index(d["contributionLevel"]) if d["contributionLevel"] in LEVELS else 0
-            n = d["contributionCount"]
-            p.append(f'<rect x="{left + wi * step}" y="{top + row * step}" width="{cell}" height="{cell}" rx="3" '
-                     f'fill="{t["ramp"][lvl]}"><title>{n} contribution{"s" if n != 1 else ""} on {d["date"]}</title></rect>')
-
-    # Legend: Less -> More
-    ly = top + 7 * step + 22
-    lx = W - 24 - (5 * step) - 74
-    p.append(f'<text x="{lx}" y="{ly + 10}" font-family="{MONO}" font-size="11" fill="{t["muted"]}">Less</text>')
-    for i, c in enumerate(t["ramp"]):
-        p.append(f'<rect x="{lx + 34 + i * step}" y="{ly}" width="{cell}" height="{cell}" rx="3" fill="{c}"/>')
-    p.append(f'<text x="{lx + 38 + 5 * step}" y="{ly + 10}" font-family="{MONO}" font-size="11" fill="{t["muted"]}">More</text>')
-    p.append(f'<text x="{left}" y="{ly + 10}" font-family="{MONO}" font-size="11" fill="{t["muted"]}">'
-             f'Updated {date.today().strftime("%d %b %Y")} · includes private work as anonymous counts</text>')
-    p.append("</svg>")
-    return "".join(p)
 
 
 def main():
-    cal = fetch(LOGIN)
+    cc = fetch(LOGIN)
     OUT.mkdir(parents=True, exist_ok=True)
     for name, t in THEMES.items():
-        (OUT / f"contrib-{name}.svg").write_text(summary_svg(cal, t), encoding="utf-8")
-    print(f'{cal["totalContributions"]} contributions -> {OUT}/contrib-{{light,dark}}.svg')
+        (OUT / f"contrib-{name}.svg").write_text(summary_svg(cc, t, name), encoding="utf-8")
+    total, values = breakdown(cc)
+    print(f"{total} contributions {values} -> {OUT}/contrib-{{light,dark}}.svg")
 
 
 if __name__ == "__main__":
