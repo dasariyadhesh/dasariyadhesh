@@ -66,6 +66,15 @@ I design and build backend systems that stay correct when things fail: Kafka pip
 
 Each project has a small demo you can run in the browser on the [portfolio](https://dasariyadhesh.github.io/#systems).
 
+### Activity
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/contrib-dark.svg">
+  <img src="assets/contrib-light.svg" alt="Contribution heatmap for the last 12 months" width="100%">
+</picture>
+
+<sub>Redrawn daily by a GitHub Action from the contribution calendar. Private work counts as anonymous contributions.</sub>
+
 ### How I work
 
 - **Fail closed.** Retries, dead-letter queues and human review come before automation.

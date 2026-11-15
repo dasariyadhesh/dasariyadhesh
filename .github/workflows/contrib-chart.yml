@@ -1,0 +1,40 @@
+name: Contribution chart
+
+on:
+  schedule:
+    - cron: "30 0 * * *"   # daily, 06:00 IST
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: contrib-chart
+  cancel-in-progress: true
+
+jobs:
+  draw:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Draw chart
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/contrib_chart.py "${{ github.repository_owner }}" assets
+
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/contrib-light.svg assets/contrib-dark.svg
+          if git diff --cached --quiet; then
+            echo "Chart unchanged."
+          else
+            git commit -m "chore: refresh contribution chart"
+            git push
+          fi
