@@ -1,0 +1,42 @@
+name: Request access to a private repository
+description: Ask for read-only access to one of my private projects.
+title: "Access request: social-comment-response-agent"
+labels: ["access-request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for your interest. I'll add your GitHub account (the one opening this request) as a read-only collaborator, usually within a day.
+        This request is public. Don't include phone numbers or anything private; I'll reply here.
+  - type: dropdown
+    id: repo
+    attributes:
+      label: Repository
+      options:
+        - social-comment-response-agent (AI comment reply agent)
+        - trust (Bhu Seva trust website)
+    validations:
+      required: true
+  - type: input
+    id: who
+    attributes:
+      label: Your name and company or role
+      placeholder: "Priya S, Engineering Manager at Example Corp"
+    validations:
+      required: true
+  - type: dropdown
+    id: reason
+    attributes:
+      label: Why do you need access?
+      options:
+        - Hiring or interview process
+        - Technical review of the design and code
+        - Possible collaboration
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: note
+    attributes:
+      label: Anything else?
+      description: Optional. For example, if you'd prefer a live walkthrough instead.

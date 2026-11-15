@@ -66,6 +66,8 @@ I design and build backend systems that stay correct when things fail: Kafka pip
 
 Each project has a small demo you can run in the browser on the [portfolio](https://dasariyadhesh.github.io/#systems).
 
+**Social Comment Response Agent is a private repository.** <a href="https://github.com/dasariyadhesh/dasariyadhesh/issues/new?template=access-request.yml&title=Access+request%3A+social-comment-response-agent"><img alt="Request access" src="https://img.shields.io/badge/Request%20access-private%20repo-0f6b5c?style=flat-square&logo=github&logoColor=white" align="absmiddle"></a> I'll add you as a read-only collaborator.
+
 ### Activity
 
 <picture>
