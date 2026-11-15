@@ -72,10 +72,10 @@ Each project has a small demo you can run in the browser on the [portfolio](http
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/contrib-dark.svg">
-  <img src="assets/contrib-light.svg" alt="Contribution heatmap for the last 12 months" width="100%">
+  <img src="assets/contrib-light.svg" alt="Contributions and active days in the last 12 months" width="100%">
 </picture>
 
-<sub>Redrawn daily by a GitHub Action from the contribution calendar. Private work counts as anonymous contributions.</sub>
+<sub>Updated daily by a GitHub Action. Private work counts as anonymous contributions.</sub>
 
 ### How I work
 

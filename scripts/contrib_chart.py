@@ -1,4 +1,7 @@
-"""Draw the last year of GitHub contributions as light and dark SVG heatmaps.
+"""Draw the last year of GitHub contributions as light and dark SVG summary cards.
+
+The card shows total contributions and active days. svg() still draws the
+full heatmap if it is ever wanted again; main() uses summary_svg().
 
 Reads the public contribution calendar (private work is included as anonymous
 counts when "Include private contributions" is on) and writes
@@ -77,6 +80,29 @@ def stats(days):
     return longest, current, busiest, active
 
 
+def summary_svg(cal, t):
+    """Two figures only: contributions and active days in the last 12 months."""
+    days = [d for w in cal["weeks"] for d in w["contributionDays"]]
+    active = sum(1 for d in days if d["contributionCount"])
+    W, H = 920, 132
+    figures = [(f'{cal["totalContributions"]:,}', "contributions"), (f"{active:,}", "active days")]
+    p = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" role="img" '
+         f'aria-label="{cal["totalContributions"]} contributions and {active} active days in the last 12 months">',
+         f'<rect x="0.5" y="0.5" width="{W - 1}" height="{H - 1}" rx="12" fill="{t["bg"]}" stroke="{t["line"]}"/>',
+         f'<text x="32" y="38" font-family="{MONO}" font-size="12" font-weight="600" fill="{t["muted"]}" '
+         f'letter-spacing="1.2">LAST 12 MONTHS ON GITHUB</text>']
+    x = 32
+    for val, lab in figures:
+        p.append(f'<text x="{x}" y="88" font-family="{SANS}" font-size="40" font-weight="800" fill="{t["ink"]}">{escape(val)}</text>')
+        p.append(f'<text x="{x}" y="112" font-family="{MONO}" font-size="12" fill="{t["muted"]}">{escape(lab)}</text>')
+        x += 240
+    p.append(f'<line x1="{32 + 210}" y1="56" x2="{32 + 210}" y2="114" stroke="{t["line"]}"/>')
+    p.append(f'<text x="{W - 32}" y="112" font-family="{MONO}" font-size="11" fill="{t["muted"]}" text-anchor="end">'
+             f'updated {date.today().strftime("%d %b %Y")} · includes private work</text>')
+    p.append("</svg>")
+    return "".join(p)
+
+
 def svg(cal, t):
     weeks = cal["weeks"]
     days = [d for w in weeks for d in w["contributionDays"]]
@@ -151,7 +177,7 @@ def main():
     cal = fetch(LOGIN)
     OUT.mkdir(parents=True, exist_ok=True)
     for name, t in THEMES.items():
-        (OUT / f"contrib-{name}.svg").write_text(svg(cal, t), encoding="utf-8")
+        (OUT / f"contrib-{name}.svg").write_text(summary_svg(cal, t), encoding="utf-8")
     print(f'{cal["totalContributions"]} contributions -> {OUT}/contrib-{{light,dark}}.svg')
 
 
