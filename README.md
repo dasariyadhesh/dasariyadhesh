@@ -9,7 +9,7 @@ I design systems the way I'd want to inherit them: decisions written down with t
 ### Now
 
 - **Blue Yonder (Panasonic)**, Software Engineer · Sep 2024 – present
-  Warehouse and Yard Management: gate automation, camera-based yard tracking, WMS–YMS discrepancy detection, performance work across Spring Boot, Kafka, GraphQL and Azure.
+  Distributed platform of 40 microservices over Kafka: dead-letter queues, idempotent consumers, retries with backoff. Warehouse and Yard Management: gate automation, camera-based yard tracking, WMS–YMS discrepancy detection, performance work across Spring Boot, Kafka, GraphQL and Azure.
 - **Innominds Software**, Associate Software Engineer · May 2022 – Sep 2024
   Built the DS PRO commission engine (Drools rules, 50K+ users), led the OrientDB → MySQL migration of 1M+ records, GDPR masking and retention, Flyway migrations.
 
